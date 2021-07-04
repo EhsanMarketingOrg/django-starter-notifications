@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # local apps
+    'our_notifications',
 ]
 
 MIDDLEWARE = [
@@ -126,3 +128,36 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    # ...
+    ("downloads", "/opt/webfiles/stats"),
+]
+
+
+#================= django-notifications-hq (start) =========================
+# django-notifications-hq AbstractNotification model settings
+NOTIFICATIONS_NOTIFICATION_MODEL = 'our_notifications.Notification'
+
+# django-notifications-hq config
+DJANGO_NOTIFICATIONS_CONFIG = { 
+    'USE_JSONFIELD': True, # for Extra data field
+}
+
+# notifications/templates dir
+try:
+    import notifications as ntftn
+    NOTIFICATIONS_APP_DIR = Path(ntftn.__dict__['__file__']).resolve().parent
+    if Path.exists(NOTIFICATIONS_APP_DIR / 'templates'):
+        TEMPLATES[0]['DIRS'].append(NOTIFICATIONS_APP_DIR / 'templates')
+    
+    if Path.exists(NOTIFICATIONS_APP_DIR / 'static'):
+        try:
+            STATICFILES_DIRS.append(NOTIFICATIONS_APP_DIR / 'static')
+        except:
+            STATICFILES_DIRS = {
+                NOTIFICATIONS_APP_DIR / 'static',
+            }
+except:
+    pass
+#================= django-notifications-hq (end) =========================
